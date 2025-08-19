@@ -1,0 +1,130 @@
+{
+  "groups": [
+    {
+      "name": "docx",
+      "type": "com.docx.properties.DocxProperties",
+      "sourceType": "com.docx.properties.DocxProperties"
+    },
+    {
+      "name": "docx.branding",
+      "type": "com.docx.properties.DocxProperties$Branding",
+      "sourceType": "com.docx.properties.DocxProperties",
+      "sourceMethod": "getBranding()"
+    },
+    {
+      "name": "docx.features",
+      "type": "com.docx.properties.DocxProperties$Features",
+      "sourceType": "com.docx.properties.DocxProperties",
+      "sourceMethod": "getFeatures()"
+    },
+    {
+      "name": "docx.scan",
+      "type": "com.docx.properties.DocxProperties$Scan",
+      "sourceType": "com.docx.properties.DocxProperties",
+      "sourceMethod": "getScan()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "docx.base-path",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties"
+    },
+    {
+      "name": "docx.branding.color",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties$Branding"
+    },
+    {
+      "name": "docx.branding.logo-url",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties$Branding"
+    },
+    {
+      "name": "docx.branding.title",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties$Branding"
+    },
+    {
+      "name": "docx.description",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties"
+    },
+    {
+      "name": "docx.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties"
+    },
+    {
+      "name": "docx.features.auto-generate-examples",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Features"
+    },
+    {
+      "name": "docx.features.export-openapi",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Features"
+    },
+    {
+      "name": "docx.features.manual-response-docs",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Features"
+    },
+    {
+      "name": "docx.features.search",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Features"
+    },
+    {
+      "name": "docx.features.try-it-out",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Features"
+    },
+    {
+      "name": "docx.scan.auto-discover",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Scan"
+    },
+    {
+      "name": "docx.scan.exclude-packages",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.docx.properties.DocxProperties$Scan"
+    },
+    {
+      "name": "docx.scan.include-examples",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Scan"
+    },
+    {
+      "name": "docx.scan.include-packages",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.docx.properties.DocxProperties$Scan"
+    },
+    {
+      "name": "docx.scan.include-test-controllers",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Scan"
+    },
+    {
+      "name": "docx.scan.include-validation",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.docx.properties.DocxProperties$Scan"
+    },
+    {
+      "name": "docx.theme",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties"
+    },
+    {
+      "name": "docx.title",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties"
+    },
+    {
+      "name": "docx.version",
+      "type": "java.lang.String",
+      "sourceType": "com.docx.properties.DocxProperties"
+    }
+  ],
+  "hints": []
+}

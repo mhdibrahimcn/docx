@@ -1,0 +1,59 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: docx-demo
+  
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Docx Configuration
+docx:
+  enabled: true
+  base-path: /docx
+  theme: auto
+  title: "Docx Demo API Documentation"
+  version: "1.0.0"
+  description: "Comprehensive API documentation showcasing Docx capabilities with Laravel Scramble-inspired UI"
+  
+  branding:
+    title: "Docx Demo API"
+    color: "#3B82F6"
+    logo-url: null
+  
+  scan:
+    auto-discover: true
+    exclude-packages:
+      - "com.docx.demo.internal"
+    include-validation: true
+    include-examples: true
+    include-test-controllers: false
+  
+  features:
+    search: true
+    try-it-out: false
+    export-openapi: true
+    auto-generate-examples: true
+    manual-response-docs: true
+
+logging:
+  level:
+    com.docx: DEBUG
+    root: INFO

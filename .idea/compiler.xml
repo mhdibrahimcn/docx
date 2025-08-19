@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="docx-core" />
+        <module name="docx-maven-plugin" />
+        <module name="docx-demo" />
+        <module name="docx-spring-boot-starter" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="docx-core" options="-parameters" />
+      <module name="docx-demo" options="-parameters" />
+      <module name="docx-maven-plugin" options="-parameters" />
+      <module name="docx-spring-boot-starter" options="-parameters" />
+    </option>
+  </component>
+</project>

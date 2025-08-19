@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.docx</groupId>
+        <artifactId>docx-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>docx-demo</artifactId>
+    <name>Docx Demo Application</name>
+    <description>Demo application showcasing Docx API documentation generator</description>
+
+    <dependencies>
+        <!-- Docx Spring Boot Starter -->
+        <dependency>
+            <groupId>com.docx</groupId>
+            <artifactId>docx-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starters -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            
+            <!-- Docx Maven Plugin -->
+            <plugin>
+                <groupId>com.docx</groupId>
+                <artifactId>docx-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <autoScanControllers>true</autoScanControllers>
+                    <excludePackages>
+                        <package>com.docx.demo.internal</package>
+                    </excludePackages>
+                    <title>Docx Demo API</title>
+                    <version>1.0.0</version>
+                    <description>Comprehensive API documentation for the Docx demo application</description>
+                    <theme>auto</theme>
+                    <brandingColor>#3B82F6</brandingColor>
+                    <autoGenerateExamples>true</autoGenerateExamples>
+                    <manualResponseDocs>true</manualResponseDocs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
