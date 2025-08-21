@@ -4,10 +4,12 @@ com/docx/generators/HtmlTemplateEngine.class
 com/docx/models/FieldDoc.class
 com/docx/processors/AopExampleGenerator.class
 com/docx/models/ResponseDoc.class
+com/docx/services/ApiDocumentationService.class
 com/docx/models/ApiDocumentation.class
 com/docx/processors/SpringAnnotationProcessor.class
 com/docx/parsers/JavaDocParser$ParsedJavaDoc.class
 com/docx/annotations/EnableDocx.class
+com/docx/config/TemplateConfig.class
 com/docx/models/ControllerDoc.class
 com/docx/parsers/JavaDocParser.class
 com/docx/models/ModelDoc.class

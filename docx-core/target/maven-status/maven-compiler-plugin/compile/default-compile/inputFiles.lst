@@ -2,6 +2,8 @@
 /home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/processors/ControllerScanner.java
 /home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/processors/SpringAnnotationProcessor.java
 /home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/processors/AopExampleGenerator.java
+/home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/services/ApiDocumentationService.java
+/home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/config/TemplateConfig.java
 /home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/models/ValidationConstraint.java
 /home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/config/DocxConfiguration.java
 /home/cn/Documents/CN_workspace/docx-project/docx-core/src/main/java/com/docx/generators/DocumentationGenerator.java
