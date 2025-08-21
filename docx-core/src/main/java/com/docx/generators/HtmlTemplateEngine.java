@@ -1,10 +1,11 @@
 package com.docx.generators;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HtmlTemplateEngine {
 
@@ -649,7 +650,7 @@ public class HtmlTemplateEngine {
                 `;
                 
                 setupLanguageTabsForPanel();
-                generateSnippet(endpointId, 'cURL');
+                generateSnippet(endpointId, 'CURL');
             }
             
             function initSearch() {
@@ -768,64 +769,91 @@ public class HtmlTemplateEngine {
                     - **IMPORTANT: Only output the raw code. No markdown, no explanations, just the code.**
                 `;
                 
-                try {
-                    const generatedCode = await callGeminiApi(prompt);
-                    snippetContainer.innerHTML = `<pre><code>${generatedCode.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`;
-                } catch (error) {
-                    console.error("Gemini API call failed:", error);
-                    // Fallback to static code generation
-                    let code = '';
-                    switch(language) {
-                        case 'cURL':
-                            code = `curl -X ${endpoint.httpMethod} "${endpoint.url}" \\\\n  -H "Content-Type: application/json" \\\\n  -H "Authorization: Bearer YOUR_TOKEN"`;
-                            if (endpoint.requestBody) {
-                                code += ` \\\\n  -d '${endpoint.requestBody.example || '{}'}'`;
-                            }
-                            break;
-                        case 'JavaScript':
-                            code = `fetch("${endpoint.url}", {\\n  method: "${endpoint.httpMethod}",\\n  headers: {\\n    "Content-Type": "application/json",\\n    "Authorization": "Bearer YOUR_TOKEN"\\n  }`;
-                            if (endpoint.requestBody) {
-                                code += `,\\n  body: JSON.stringify(${endpoint.requestBody.example || '{}'})`;
-                            }
-                            code += `\\n})\\n.then(response => response.json())\\n.then(data => console.log(data));`;
-                            break;
-                        case 'Python':
-                            code = `import requests\\n\\nurl = "${endpoint.url}"\\nheaders = {\\n    "Content-Type": "application/json",\\n    "Authorization": "Bearer YOUR_TOKEN"\\n}`;
-                            if (endpoint.requestBody) {
-                                code += `\\ndata = ${endpoint.requestBody.example || '{}'}\\n\\nresponse = requests.${endpoint.httpMethod.toLowerCase()}(url, headers=headers, json=data)`;
-                            } else {
-                                code += `\\n\\nresponse = requests.${endpoint.httpMethod.toLowerCase()}(url, headers=headers)`;
-                            }
-                            code += `\\nprint(response.json())`;
-                            break;
-                    }
-                    snippetContainer.innerHTML = `<pre><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`;
-                }
+                // Static code generation - no API dependency
+                let code = generateStaticCodeSnippet(endpoint, language);
+                snippetContainer.innerHTML = `<pre><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`;
             }
 
-            async function callGeminiApi(prompt, maxRetries = 3) {
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        const result = await response.json();
-                        if (result.candidates?.[0]?.content?.parts?.[0]) {
-                            return result.candidates[0].content.parts[0].text;
-                        } else {
-                            throw new Error("Invalid response structure from Gemini API");
-                        }
-                    } catch (error) {
-                        if (i === maxRetries - 1) throw error;
-                        await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
-                    }
+            function generateStaticCodeSnippet(endpoint, language) {
+                let code = '';
+                let url = endpoint.url;
+                
+                // Replace path variables with example values
+                if (endpoint.pathVariables) {
+                    endpoint.pathVariables.forEach(param => {
+                        const exampleValue = param.type === 'Long' || param.type === 'Integer' ? '123' : 
+                                           param.type === 'String' ? 'example' : 'value';
+                        url = url.replace(`{${param.name}}`, exampleValue);
+                    });
                 }
+                
+                // Add query parameters
+                if (endpoint.queryParameters && endpoint.queryParameters.length > 0) {
+                    const queryParams = endpoint.queryParameters.map(param => {
+                        const exampleValue = param.type === 'Long' || param.type === 'Integer' ? '123' : 
+                                           param.type === 'String' ? 'example' : 'value';
+                        return `${param.name}=${exampleValue}`;
+                    }).join('&');
+                    url += (url.includes('?') ? '&' : '?') + queryParams;
+                }
+                
+                switch(language) {
+                    case 'cURL':
+                        code = `curl -X ${endpoint.httpMethod} "${url}" \\\\
+  -H "Content-Type: application/json" \\\\
+  -H "Authorization: Bearer YOUR_TOKEN"`;
+                        if (endpoint.requestBody) {
+                            code += ` \\\\
+  -d '${endpoint.requestBody.example || '{}'}'`;
+                        }
+                        break;
+                        
+                    case 'JavaScript':
+                        code = `fetch("${url}", {
+  method: "${endpoint.httpMethod}",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_TOKEN"
+  }`;
+                        if (endpoint.requestBody) {
+                            code += `,
+  body: JSON.stringify(${endpoint.requestBody.example || '{}'})`;
+                        }
+                        code += `
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+                        break;
+                        
+                    case 'Python':
+                        code = `import requests
+
+url = "${url}"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_TOKEN"
+}`;
+                        if (endpoint.requestBody) {
+                            code += `
+data = ${endpoint.requestBody.example || '{}'}
+
+response = requests.${endpoint.httpMethod.toLowerCase()}(url, headers=headers, json=data)`;
+                        } else {
+                            code += `
+
+response = requests.${endpoint.httpMethod.toLowerCase()}(url, headers=headers)`;
+                        }
+                        code += `
+print(f"Status Code: {response.status_code}")
+print(f"Response: {response.json()}")`;
+                        break;
+                        
+                    default:
+                        code = `// Code snippet for ${language} not available`;
+                }
+                
+                return code;
             }
 
             function getEndpointById(endpointId) {

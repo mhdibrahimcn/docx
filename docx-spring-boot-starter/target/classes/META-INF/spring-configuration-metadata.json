@@ -9,19 +9,19 @@
       "name": "docx.branding",
       "type": "com.docx.properties.DocxProperties$Branding",
       "sourceType": "com.docx.properties.DocxProperties",
-      "sourceMethod": "getBranding()"
+      "sourceMethod": "public com.docx.properties.DocxProperties.Branding getBranding() "
     },
     {
       "name": "docx.features",
       "type": "com.docx.properties.DocxProperties$Features",
       "sourceType": "com.docx.properties.DocxProperties",
-      "sourceMethod": "getFeatures()"
+      "sourceMethod": "public com.docx.properties.DocxProperties.Features getFeatures() "
     },
     {
       "name": "docx.scan",
       "type": "com.docx.properties.DocxProperties$Scan",
       "sourceType": "com.docx.properties.DocxProperties",
-      "sourceMethod": "getScan()"
+      "sourceMethod": "public com.docx.properties.DocxProperties.Scan getScan() "
     }
   ],
   "properties": [

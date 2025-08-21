@@ -35,21 +35,21 @@ public class UserController {
 
     /**
      * Retrieves a paginated list of all users.
-     * 
+     *
      * This endpoint supports pagination and optional filtering by username
      * or email. Results are sorted by creation date in descending order.
-     * 
+     *
      * @param pageable Pagination information including page number, size, and sort
      * @param username Optional username filter for searching users
      * @param email Optional email filter for searching users
      * @param active Optional filter to show only active or inactive users
      * @return Paginated list of users matching the search criteria
-     * 
+     *
      * @apiExample GET /api/users?page=0&size=10&username=john
      * @apiExample GET /api/users?active=true&sort=createdAt,desc
-     * @apiResponse 200 Successfully retrieved user list with pagination metadata
+     * @apiResponse 200 Successfully retrieved user list with pagination metadatadddddddddddd
      * @apiResponse 400 Invalid pagination parameters provided
-     * @apiResponse 500 Internal server error occurred while fetching users
+     * @apiResponse 500 Internal server error occurred while fetching usersfff
      */
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(
@@ -57,7 +57,7 @@ public class UserController {
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) Boolean active) {
-        
+
         List<User> filteredUsers = userRepository.values().stream()
                 .filter(user -> username == null || user.getUsername().toLowerCase().contains(username.toLowerCase()))
                 .filter(user -> email == null || user.getEmail().toLowerCase().contains(email.toLowerCase()))
