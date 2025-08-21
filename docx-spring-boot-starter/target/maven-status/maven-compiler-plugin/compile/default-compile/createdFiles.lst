@@ -1,0 +1,6 @@
+com/docx/properties/DocxProperties$Features.class
+com/docx/config/DocxAutoConfiguration.class
+com/docx/properties/DocxProperties.class
+com/docx/properties/DocxProperties$Scan.class
+com/docx/properties/DocxProperties$Branding.class
+com/docx/controllers/DocxController.class

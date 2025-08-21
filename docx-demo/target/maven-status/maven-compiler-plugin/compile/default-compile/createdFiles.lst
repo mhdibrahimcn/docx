@@ -1,0 +1,5 @@
+com/docx/demo/models/Product.class
+com/docx/demo/models/User.class
+com/docx/demo/controllers/UserController.class
+com/docx/demo/DemoApplication.class
+com/docx/demo/controllers/ProductController.class

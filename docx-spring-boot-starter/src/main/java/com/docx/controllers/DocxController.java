@@ -4,6 +4,8 @@ import com.docx.generators.DocumentationGenerator;
 import com.docx.models.ApiDocumentation;
 import com.docx.processors.ControllerScanner;
 import com.docx.properties.DocxProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,8 @@ import java.util.Map;
 @RequestMapping("${docx.base-path:/docx}")
 public class DocxController {
 
+    private static final Logger logger = LoggerFactory.getLogger(DocxController.class);
+
     private final DocumentationGenerator documentationGenerator;
     private final ControllerScanner controllerScanner;
     private final DocxProperties properties;
@@ -29,12 +33,16 @@ public class DocxController {
         this.documentationGenerator = documentationGenerator;
         this.controllerScanner = controllerScanner;
         this.properties = properties;
+        logger.info("DocxController initialized with properties: {}", properties);
     }
 
     @GetMapping(value = {"", "/"}, produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> index() {
+        logger.info("DocX index page requested");
         ApiDocumentation apiDoc = getOrGenerateDocumentation();
+        logger.info("Generating HTML for {} controllers", apiDoc.getControllers().size());
         String html = documentationGenerator.generateIndexHtml(apiDoc);
+        logger.debug("Generated HTML length: {} characters", html.length());
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_HTML)
                 .body(html);
@@ -85,12 +93,15 @@ public class DocxController {
 
     @GetMapping(value = "/api/documentation.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiDocumentation> apiDocumentation() {
+        logger.info("API documentation JSON requested");
         ApiDocumentation apiDoc = getOrGenerateDocumentation();
+        logger.info("Returning API documentation with {} controllers", apiDoc.getControllers().size());
         return ResponseEntity.ok(apiDoc);
     }
 
     @GetMapping(value = "/api/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> refresh() {
+        logger.info("Documentation refresh requested");
         cachedDocumentation = null; // Clear cache
         getOrGenerateDocumentation(); // Regenerate
         return ResponseEntity.ok(Map.of("status", "refreshed", "timestamp", String.valueOf(System.currentTimeMillis())));
@@ -109,7 +120,19 @@ public class DocxController {
 
     private ApiDocumentation getOrGenerateDocumentation() {
         if (cachedDocumentation == null) {
+            logger.info("No cached documentation found, generating new documentation...");
             cachedDocumentation = controllerScanner.scanAndGenerateDocumentation();
+            logger.info("Documentation generated with {} controllers", 
+                    cachedDocumentation != null ? cachedDocumentation.getControllers().size() : 0);
+            if (cachedDocumentation != null && cachedDocumentation.getControllers() != null) {
+                cachedDocumentation.getControllers().forEach(controller -> 
+                    logger.debug("Controller found: {} with {} endpoints", 
+                            controller.getName(), 
+                            controller.getEndpoints() != null ? controller.getEndpoints().size() : 0));
+            }
+        } else {
+            logger.debug("Using cached documentation with {} controllers", 
+                    cachedDocumentation.getControllers().size());
         }
         return cachedDocumentation;
     }

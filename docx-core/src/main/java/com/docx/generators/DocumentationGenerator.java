@@ -30,7 +30,7 @@ public class DocumentationGenerator {
             context.put("title", apiDocumentation.getTitle());
             context.put("version", apiDocumentation.getVersion());
             context.put("description", apiDocumentation.getDescription());
-            context.put("controllers", apiDocumentation.getControllers());
+            context.put("controllers", convertControllersToMaps(apiDocumentation.getControllers()));
             context.put("theme", "auto"); // Would come from properties
             context.put("brandingColor", "#3B82F6");
             
@@ -102,5 +102,59 @@ public class DocumentationGenerator {
             }
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+    
+    private java.util.List<Map<String, Object>> convertControllersToMaps(java.util.List<ControllerDoc> controllers) {
+        if (controllers == null) {
+            return java.util.Collections.emptyList();
+        }
+        
+        return controllers.stream()
+                .map(this::convertControllerToMap)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    private Map<String, Object> convertControllerToMap(ControllerDoc controller) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", controller.getName());
+        map.put("className", controller.getClassName());
+        map.put("description", controller.getDescription());
+        map.put("baseUrl", controller.getBaseUrl());
+        map.put("author", controller.getAuthor());
+        map.put("since", controller.getSince());
+        map.put("version", controller.getVersion());
+        map.put("tags", controller.getTags());
+        
+        // Convert endpoints
+        if (controller.getEndpoints() != null) {
+            java.util.List<Map<String, Object>> endpointMaps = controller.getEndpoints().stream()
+                    .map(this::convertEndpointToMap)
+                    .collect(java.util.stream.Collectors.toList());
+            map.put("endpoints", endpointMaps);
+        } else {
+            map.put("endpoints", java.util.Collections.emptyList());
+        }
+        
+        return map;
+    }
+    
+    private Map<String, Object> convertEndpointToMap(EndpointDoc endpoint) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", endpoint.getName());
+        map.put("description", endpoint.getDescription());
+        map.put("httpMethod", endpoint.getHttpMethod());
+        map.put("url", endpoint.getUrl());
+        map.put("parameters", endpoint.getParameters());
+        map.put("pathVariables", endpoint.getPathVariables());
+        map.put("queryParameters", endpoint.getQueryParameters());
+        map.put("requestBody", endpoint.getRequestBody());
+        map.put("responseBody", endpoint.getResponseBody());
+        map.put("responses", endpoint.getResponses());
+        map.put("examples", endpoint.getExamples());
+        map.put("tags", endpoint.getTags());
+        map.put("deprecated", endpoint.isDeprecated());
+        map.put("apiNote", endpoint.getApiNote());
+        map.put("apiDescription", endpoint.getApiDescription());
+        return map;
     }
 }
