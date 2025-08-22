@@ -33,7 +33,12 @@ public class HtmlTemplateEngine {
                     %s
                 </style>
             </head>
-            <body>
+            <body data-theme="dark">
+                <!-- Theme Toggle Button -->
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙
+                </button>
+                
                 <div class="main-container">
                     <aside id="sidebar">
                         <div class="sidebar-header">
@@ -96,6 +101,39 @@ public class HtmlTemplateEngine {
                 --purple-600: #9333ea;
                 --red-600: #dc2626;
                 --primary-color: #FFD700;
+            }
+            
+            /* Dark/Light Theme Support */
+            [data-theme="dark"] {
+                --slate-50: #0f172a;
+                --slate-100: #1e293b;
+                --slate-300: #cbd5e1;
+                --slate-400: #94a3b8;
+                --slate-500: #64748b;
+                --slate-600: #475569;
+                --slate-700: #334155;
+                --slate-800: #1e293b;
+                --slate-900: #0f172a;
+                --white: #f8fafc;
+            }
+            
+            /* Theme Toggle Button */
+            .theme-toggle {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                background: var(--slate-800);
+                border: 1px solid var(--slate-600);
+                border-radius: 8px;
+                padding: 8px;
+                cursor: pointer;
+                color: var(--slate-300);
+                transition: all 0.2s ease;
+            }
+            .theme-toggle:hover {
+                background: var(--slate-700);
+                transform: scale(1.05);
             }
 
             html { scroll-behavior: smooth; }
@@ -283,8 +321,65 @@ public class HtmlTemplateEngine {
                 font-weight: 600;
                 border-bottom: 1px solid var(--slate-700);
                 cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
             .utility-section-content { padding: 1rem; }
+            
+            /* Collapsible Sections */
+            .utility-section.collapsed .utility-section-content {
+                display: none;
+            }
+            .section-chevron {
+                transition: transform 0.2s ease;
+            }
+            .utility-section.collapsed .section-chevron {
+                transform: rotate(-90deg);
+            }
+            
+            /* Environment Selector */
+            .environment-selector {
+                margin-bottom: 1rem;
+            }
+            .environment-selector select {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid var(--slate-600);
+                border-radius: 0.25rem;
+                background-color: var(--slate-900);
+                color: var(--slate-300);
+            }
+            
+            /* Response Display */
+            .response-display {
+                background-color: var(--slate-900);
+                border: 1px solid var(--slate-700);
+                border-radius: 0.375rem;
+                padding: 1rem;
+                margin-top: 1rem;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            .response-status {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                font-weight: 600;
+            }
+            .status-badge {
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+            .status-200 { background-color: #10b981; color: white; }
+            .status-201 { background-color: #10b981; color: white; }
+            .status-400 { background-color: #ef4444; color: white; }
+            .status-404 { background-color: #ef4444; color: white; }
+            .status-422 { background-color: #f59e0b; color: white; }
+            .status-500 { background-color: #ef4444; color: white; }
             .form-group { margin-bottom: 1rem; }
             .form-group label {
                 display: block;
@@ -428,8 +523,27 @@ public class HtmlTemplateEngine {
     private String getJavaScript() {
         return """
             let currentEndpointId = null;
+            let currentTheme = localStorage.getItem('theme') || 'dark';
+
+            // Theme Management
+            function toggleTheme() {
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', currentTheme);
+                document.body.setAttribute('data-theme', currentTheme);
+                
+                const themeButton = document.querySelector('.theme-toggle');
+                themeButton.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+            }
+
+            // Initialize theme on load
+            function initializeTheme() {
+                document.body.setAttribute('data-theme', currentTheme);
+                const themeButton = document.querySelector('.theme-toggle');
+                themeButton.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+            }
 
             document.addEventListener('DOMContentLoaded', () => {
+                initializeTheme();
                 const sidebarNav = document.getElementById('sidebar-nav');
                 const apiContent = document.getElementById('api-content');
                 document.getElementById('api-title-sidebar').textContent = jsonData.title;
@@ -607,18 +721,36 @@ public class HtmlTemplateEngine {
                 }
 
                 panel.innerHTML = `
-                    <div class="utility-section">
-                        <div class="utility-section-header">Authentication</div>
+                    <!-- Environment Selector -->
+                    <div class="environment-selector">
+                        <label for="environment-select">Environment</label>
+                        <select id="environment-select">
+                            <option value="local">🌐 Local Development</option>
+                            <option value="staging">🚀 Staging</option>
+                            <option value="production">⚡ Production</option>
+                        </select>
+                    </div>
+
+                    <!-- Authentication Section -->
+                    <div class="utility-section" id="auth-section">
+                        <div class="utility-section-header" onclick="toggleSection('auth-section')">
+                            <span>🔑 Authentication</span>
+                            <span class="section-chevron">▼</span>
+                        </div>
                         <div class="utility-section-content">
                             <div class="form-group">
                                 <label for="auth-token">Bearer Token</label>
-                                <input type="text" id="auth-token" placeholder="Enter your API token">
+                                <input type="text" id="auth-token" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." oninput="updateRequestSample()">
                             </div>
                         </div>
                     </div>
 
-                    <div class="utility-section">
-                        <div class="utility-section-header">Parameters</div>
+                    <!-- Parameters Section -->
+                    <div class="utility-section" id="params-section">
+                        <div class="utility-section-header" onclick="toggleSection('params-section')">
+                            <span>📝 Parameters</span>
+                            <span class="section-chevron">▼</span>
+                        </div>
                         <div class="utility-section-content">
                             ${pathParamsInputs}
                             ${queryParamsInputs}
@@ -627,7 +759,7 @@ public class HtmlTemplateEngine {
 
                     ${bodyInput}
 
-                    <button class="send-request-btn" onclick="sendApiRequest('${endpointId}')">Send API Request</button>
+                    <button class="send-request-btn" onclick="sendRealApiRequest('${endpointId}')">Send API Request</button>
 
                     <div class="utility-section" style="margin-top: 1.5rem;">
                         <div class="utility-section-header">Request Sample</div>
@@ -724,25 +856,136 @@ public class HtmlTemplateEngine {
                  return `<div class="table-container"><table><thead><tr><th>Status Code</th><th>Description</th></tr></thead><tbody>${tableRows}</tbody></table></div>`;
             }
             
-            async function sendApiRequest(endpointId) {
+            // Section Toggle Functionality
+            function toggleSection(sectionId) {
+                const section = document.getElementById(sectionId);
+                section.classList.toggle('collapsed');
+            }
+
+            // Update Request Sample
+            function updateRequestSample() {
+                if (currentEndpointId) {
+                    generateSnippet(currentEndpointId, document.querySelector('.lang-tab.active')?.dataset.lang || 'cURL');
+                }
+            }
+
+            // Real API Request Function
+            async function sendRealApiRequest(endpointId) {
                 const responseContainer = document.getElementById('tester-response-container');
                 responseContainer.innerHTML = '<div class="loader"></div>';
 
-                await new Promise(res => setTimeout(res, 1000));
+                try {
+                    const endpoint = getEndpointById(endpointId);
+                    const url = buildRequestUrl(endpoint);
+                    const options = buildRequestOptions(endpoint);
 
-                const endpoint = getEndpointById(endpointId);
-                const isSuccess = Math.random() > 0.2;
-                const statusCode = isSuccess ? (endpoint.httpMethod === 'POST' ? 201 : 200) : 400;
-                const statusClass = isSuccess ? 'status-success' : 'status-error';
-                const mockResponse = {
-                    status: statusCode,
-                    data: isSuccess ? { message: "Request successful!", data: { id: 123, name: "Test Item" } } : { error: "Invalid input provided." }
+                    const response = await fetch(url, options);
+                    const responseData = await response.text();
+                    
+                    let parsedData;
+                    try {
+                        parsedData = JSON.parse(responseData);
+                    } catch (e) {
+                        parsedData = responseData;
+                    }
+
+                    const statusClass = response.ok ? 'status-success' : 'status-error';
+                    responseContainer.innerHTML = `
+                        <div class="response-status">
+                            <span>Status:</span>
+                            <span class="status-badge status-${response.status}">${response.status}</span>
+                            <span class="${statusClass}">${response.statusText}</span>
+                        </div>
+                        <div class="response-display">
+                            <pre><code>${JSON.stringify(parsedData, null, 2)}</code></pre>
+                        </div>
+                    `;
+                } catch (error) {
+                    responseContainer.innerHTML = `
+                        <div class="response-status">
+                            <span>Status:</span>
+                            <span class="status-badge status-error">Error</span>
+                            <span class="status-error">Network Error</span>
+                        </div>
+                        <div class="response-display">
+                            <pre><code>${JSON.stringify({ error: error.message }, null, 2)}</code></pre>
+                        </div>
+                    `;
+                }
+            }
+
+            // Build Request URL with Parameters
+            function buildRequestUrl(endpoint) {
+                const environment = document.getElementById('environment-select').value;
+                let baseUrl = 'http://localhost:8083'; // Default to local
+                
+                if (environment === 'staging') baseUrl = 'https://staging-api.example.com';
+                if (environment === 'production') baseUrl = 'https://api.example.com';
+                
+                let url = baseUrl + endpoint.url;
+                
+                // Replace path parameters
+                if (endpoint.pathVariables) {
+                    endpoint.pathVariables.forEach(param => {
+                        const input = document.getElementById(`tester-${param.name}-${currentEndpointId}`);
+                        if (input && input.value) {
+                            url = url.replace(`{${param.name}}`, input.value);
+                        }
+                    });
+                }
+                
+                // Add query parameters
+                const queryParams = new URLSearchParams();
+                if (endpoint.queryParameters) {
+                    endpoint.queryParameters.forEach(param => {
+                        const input = document.getElementById(`tester-${param.name}-${currentEndpointId}`);
+                        if (input && input.value) {
+                            queryParams.append(param.name, input.value);
+                        }
+                    });
+                }
+                
+                if (queryParams.toString()) {
+                    url += '?' + queryParams.toString();
+                }
+                
+                return url;
+            }
+
+            // Build Request Options
+            function buildRequestOptions(endpoint) {
+                const options = {
+                    method: endpoint.httpMethod,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
                 };
 
-                responseContainer.innerHTML = `
-                    <p><strong>Status:</strong> <span class="${statusClass}">${mockResponse.status}</span></p>
-                    <pre><code>${JSON.stringify(mockResponse.data, null, 2)}</code></pre>
-                `;
+                // Add auth token
+                const token = document.getElementById('auth-token').value;
+                if (token) {
+                    options.headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                // Add request body
+                if (endpoint.requestBody && (endpoint.httpMethod === 'POST' || endpoint.httpMethod === 'PUT' || endpoint.httpMethod === 'PATCH')) {
+                    const bodyInput = document.getElementById(`tester-body-${currentEndpointId}`);
+                    if (bodyInput && bodyInput.value.trim()) {
+                        try {
+                            options.body = JSON.stringify(JSON.parse(bodyInput.value));
+                        } catch (e) {
+                            options.body = bodyInput.value;
+                        }
+                    }
+                }
+
+                return options;
+            }
+
+            async function sendApiRequest(endpointId) {
+                // Fallback to real API request
+                return sendRealApiRequest(endpointId);
             }
 
             async function generateSnippet(endpointId, language) {
@@ -776,35 +1019,49 @@ public class HtmlTemplateEngine {
 
             function generateStaticCodeSnippet(endpoint, language) {
                 let code = '';
-                let url = endpoint.url;
+                const environment = document.getElementById('environment-select')?.value || 'local';
+                let baseUrl = 'http://localhost:8083';
                 
-                // Replace path variables with example values
+                if (environment === 'staging') baseUrl = 'https://staging-api.example.com';
+                if (environment === 'production') baseUrl = 'https://api.example.com';
+                
+                let url = baseUrl + endpoint.url;
+                
+                // Replace path variables with actual input values or examples
                 if (endpoint.pathVariables) {
                     endpoint.pathVariables.forEach(param => {
-                        const exampleValue = param.type === 'Long' || param.type === 'Integer' ? '123' : 
-                                           param.type === 'String' ? 'example' : 'value';
-                        url = url.replace(`{${param.name}}`, exampleValue);
+                        const input = document.getElementById(`tester-${param.name}-${currentEndpointId}`);
+                        const value = input?.value || (param.type === 'Long' || param.type === 'Integer' ? '123' : 'example');
+                        url = url.replace(`{${param.name}}`, value);
                     });
                 }
                 
-                // Add query parameters
+                // Add query parameters with actual input values
                 if (endpoint.queryParameters && endpoint.queryParameters.length > 0) {
                     const queryParams = endpoint.queryParameters.map(param => {
-                        const exampleValue = param.type === 'Long' || param.type === 'Integer' ? '123' : 
-                                           param.type === 'String' ? 'example' : 'value';
-                        return `${param.name}=${exampleValue}`;
-                    }).join('&');
-                    url += (url.includes('?') ? '&' : '?') + queryParams;
+                        const input = document.getElementById(`tester-${param.name}-${currentEndpointId}`);
+                        const value = input?.value || (param.type === 'Long' || param.type === 'Integer' ? '123' : 'example');
+                        return `${param.name}=${value}`;
+                    }).filter(param => !param.endsWith('='));
+                    
+                    if (queryParams.length > 0) {
+                        url += (url.includes('?') ? '&' : '?') + queryParams.join('&');
+                    }
                 }
+                
+                // Get actual auth token
+                const authToken = document.getElementById('auth-token')?.value || 'YOUR_TOKEN_HERE';
                 
                 switch(language) {
                     case 'cURL':
                         code = `curl -X ${endpoint.httpMethod} "${url}" \\\\
   -H "Content-Type: application/json" \\\\
-  -H "Authorization: Bearer YOUR_TOKEN"`;
+  -H "Authorization: Bearer ${authToken}"`;
                         if (endpoint.requestBody) {
+                            const bodyInput = document.getElementById(`tester-body-${currentEndpointId}`);
+                            const bodyContent = bodyInput?.value || endpoint.requestBody.example || '{}';
                             code += ` \\\\
-  -d '${endpoint.requestBody.example || '{}'}'`;
+  -d '${bodyContent}'`;
                         }
                         break;
                         
@@ -813,11 +1070,13 @@ public class HtmlTemplateEngine {
   method: "${endpoint.httpMethod}",
   headers: {
     "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_TOKEN"
+    "Authorization": "Bearer ${authToken}"
   }`;
                         if (endpoint.requestBody) {
+                            const bodyInput = document.getElementById(`tester-body-${currentEndpointId}`);
+                            const bodyContent = bodyInput?.value || endpoint.requestBody.example || '{}';
                             code += `,
-  body: JSON.stringify(${endpoint.requestBody.example || '{}'})`;
+  body: JSON.stringify(${bodyContent})`;
                         }
                         code += `
 })
@@ -832,11 +1091,13 @@ public class HtmlTemplateEngine {
 url = "${url}"
 headers = {
     "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_TOKEN"
+    "Authorization": "Bearer ${authToken}"
 }`;
                         if (endpoint.requestBody) {
+                            const bodyInput = document.getElementById(`tester-body-${currentEndpointId}`);
+                            const bodyContent = bodyInput?.value || endpoint.requestBody.example || '{}';
                             code += `
-data = ${endpoint.requestBody.example || '{}'}
+data = ${bodyContent}
 
 response = requests.${endpoint.httpMethod.toLowerCase()}(url, headers=headers, json=data)`;
                         } else {
