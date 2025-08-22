@@ -26,11 +26,6 @@ public class DocxAutoConfiguration implements WebMvcConfigurer {
         this.properties = properties;
     }
 
-    @Bean
-    public DocxController docxController(DocumentationGenerator documentationGenerator, 
-                                       ControllerScanner controllerScanner) {
-        return new DocxController(documentationGenerator, controllerScanner, properties);
-    }
 
     @Bean
     public ControllerScanner controllerScanner() {
